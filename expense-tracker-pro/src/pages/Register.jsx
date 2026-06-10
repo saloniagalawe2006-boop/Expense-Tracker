@@ -1,13 +1,12 @@
-// src/pages/Register.jsx
-
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 function Register() {
+    const [name, setName] = useState('')
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
     const navigate = useNavigate()
 
-    // This runs when "Create Account" button is clicked
-    // Later: collect form data → send to backend → navigate to login
-    // Now: just goes straight to login page
     function handleRegister() {
         navigate('/login')
     }
@@ -38,107 +37,48 @@ function Register() {
                 </p>
 
                 <div style={{ marginBottom: '1rem' }}>
-                    <label style={{
-                        display: 'block',
-                        marginBottom: '0.4rem',
-                        fontSize: '0.85rem',
-                        color: '#8892aa'
-                    }}>
-                        Full Name
-                    </label>
+                    <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.85rem', color: '#8892aa' }}>Full Name</label>
                     <input
                         type="text"
                         placeholder="Saloni Agalawe"
-                        style={{
-                            width: '100%',
-                            padding: '0.75rem 1rem',
-                            background: '#0e1117',
-                            border: '1px solid rgba(255,255,255,0.1)',
-                            borderRadius: '10px',
-                            color: '#f0f3ff',
-                            fontSize: '0.95rem',
-                            outline: 'none',
-                            boxSizing: 'border-box'
-                        }}
+                        value={name}
+                        onChange={e => setName(e.target.value)}
+                        style={{ width: '100%', padding: '0.75rem 1rem', background: '#0e1117', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: '#f0f3ff', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }}
                     />
                 </div>
 
                 <div style={{ marginBottom: '1rem' }}>
-                    <label style={{
-                        display: 'block',
-                        marginBottom: '0.4rem',
-                        fontSize: '0.85rem',
-                        color: '#8892aa'
-                    }}>
-                        Email
-                    </label>
+                    <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.85rem', color: '#8892aa' }}>Email</label>
                     <input
                         type="email"
                         placeholder="you@example.com"
-                        style={{
-                            width: '100%',
-                            padding: '0.75rem 1rem',
-                            background: '#0e1117',
-                            border: '1px solid rgba(255,255,255,0.1)',
-                            borderRadius: '10px',
-                            color: '#f0f3ff',
-                            fontSize: '0.95rem',
-                            outline: 'none',
-                            boxSizing: 'border-box'
-                        }}
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        style={{ width: '100%', padding: '0.75rem 1rem', background: '#0e1117', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: '#f0f3ff', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }}
                     />
                 </div>
 
                 <div style={{ marginBottom: '1.5rem' }}>
-                    <label style={{
-                        display: 'block',
-                        marginBottom: '0.4rem',
-                        fontSize: '0.85rem',
-                        color: '#8892aa'
-                    }}>
-                        Password
-                    </label>
+                    <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.85rem', color: '#8892aa' }}>Password</label>
                     <input
                         type="password"
                         placeholder="••••••••"
-                        style={{
-                            width: '100%',
-                            padding: '0.75rem 1rem',
-                            background: '#0e1117',
-                            border: '1px solid rgba(255,255,255,0.1)',
-                            borderRadius: '10px',
-                            color: '#f0f3ff',
-                            fontSize: '0.95rem',
-                            outline: 'none',
-                            boxSizing: 'border-box'
-                        }}
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        style={{ width: '100%', padding: '0.75rem 1rem', background: '#0e1117', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: '#f0f3ff', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }}
                     />
                 </div>
 
                 <button
                     onClick={handleRegister}
-                    style={{
-                        width: '100%',
-                        padding: '0.85rem',
-                        background: '#7c6dff',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '10px',
-                        fontSize: '1rem',
-                        fontWeight: '700',
-                        cursor: 'pointer',
-                        marginBottom: '1.5rem'
-                    }}
+                    style={{ width: '100%', padding: '0.85rem', background: '#7c6dff', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '1rem', fontWeight: '700', cursor: 'pointer', marginBottom: '1.5rem' }}
                 >
                     Create Account
                 </button>
 
                 <p style={{ textAlign: 'center', color: '#8892aa', fontSize: '0.9rem' }}>
                     Already have an account?{' '}
-                    <Link
-                        to="/login"
-                        style={{ color: '#7c6dff', fontWeight: '600', textDecoration: 'none' }}
-                    >
+                    <Link to="/login" style={{ color: '#7c6dff', fontWeight: '600', textDecoration: 'none' }}>
                         Sign in
                     </Link>
                 </p>
