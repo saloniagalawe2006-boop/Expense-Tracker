@@ -3,804 +3,2092 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Fina — Smart Expense Tracker</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Fina — Smart Expense Tracker by Saloni Agalawe</title>
+    <meta name="description"
+        content="Take control of your finances with Fina — the smart expense tracker with real-time insights, budget planning, and beautiful analytics." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css" />
+    <style>
+        /* ── Design Tokens ── */
+        :root {
+            --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+            --dur-fast: 150ms;
+            --dur-base: 250ms;
+            --dur-slow: 400ms;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #080a0f;
+            --bg-secondary: #0e1117;
+            --bg-tertiary: #141820;
+            --bg-card: #161b26;
+            --bg-elevated: #1c2233;
+            --border-subtle: rgba(255, 255, 255, 0.05);
+            --border-soft: rgba(255, 255, 255, 0.08);
+            --border-medium: rgba(255, 255, 255, 0.13);
+            --text-primary: #f0f3ff;
+            --text-secondary: #8892aa;
+            --text-tertiary: #50596e;
+            --accent: #7c6dff;
+            --accent-soft: rgba(124, 109, 255, 0.12);
+            --accent-mid: rgba(124, 109, 255, 0.28);
+            --accent-glow: rgba(124, 109, 255, 0.18);
+            --green: #00d68f;
+            --green-soft: rgba(0, 214, 143, 0.1);
+            --rose: #ff4d6d;
+            --rose-soft: rgba(255, 77, 109, 0.1);
+            --amber: #ffb300;
+            --amber-soft: rgba(255, 179, 0, 0.1);
+            --sky: #38b6ff;
+            --sky-soft: rgba(56, 182, 255, 0.1);
+            --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.6);
+            --shadow-xl: 0 24px 72px rgba(0, 0, 0, 0.7);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f4f6fc;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #eef1f8;
+            --bg-card: #ffffff;
+            --bg-elevated: #ffffff;
+            --border-subtle: rgba(0, 0, 0, 0.05);
+            --border-soft: rgba(0, 0, 0, 0.08);
+            --border-medium: rgba(0, 0, 0, 0.12);
+            --text-primary: #0f1320;
+            --text-secondary: #5a6278;
+            --text-tertiary: #9aa0b5;
+            --accent: #6550ef;
+            --accent-soft: rgba(101, 80, 239, 0.08);
+            --accent-mid: rgba(101, 80, 239, 0.2);
+            --accent-glow: rgba(101, 80, 239, 0.1);
+            --green: #00a86b;
+            --green-soft: rgba(0, 168, 107, 0.08);
+            --rose: #e63152;
+            --rose-soft: rgba(230, 49, 82, 0.08);
+            --amber: #e09000;
+            --amber-soft: rgba(224, 144, 0, 0.08);
+            --sky: #0099e6;
+            --sky-soft: rgba(0, 153, 230, 0.08);
+            --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.12);
+            --shadow-xl: 0 24px 72px rgba(0, 0, 0, 0.14);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            font-size: 15px;
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background .4s, color .4s;
+            overflow-x: hidden
+        }
+
+        ::selection {
+            background: var(--accent-mid);
+            color: var(--text-primary)
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-family: inherit
+        }
+
+        img {
+            max-width: 100%;
+            display: block
+        }
+
+        /* Scroll progress */
+        #scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), var(--sky));
+            z-index: 9999;
+            width: 0%;
+            transition: width .1s
+        }
+
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 900;
+            padding: 0 max(2rem, 5vw);
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background .3s, backdrop-filter .3s, border-color .3s;
+            border-bottom: 1px solid transparent
+        }
+
+        .navbar.scrolled {
+            background: rgba(8, 10, 15, .85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-color: var(--border-subtle)
+        }
+
+        .navbar.scrolled-light {
+            background: rgba(244, 246, 252, .9);
+            backdrop-filter: blur(16px);
+            border-color: var(--border-subtle)
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            font-size: 17px;
+            font-weight: 800;
+            letter-spacing: -.4px
+        }
+
+        .nav-logo-mark {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: var(--accent);
+            display: grid;
+            place-items: center;
+            color: #fff;
+            font-size: 14px;
+            box-shadow: 0 4px 14px var(--accent-mid)
+        }
+
+        .nav-logo-mark svg {
+            width: 16px;
+            height: 16px
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: .25rem
+        }
+
+        .nav-link {
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            padding: .4rem .85rem;
+            border-radius: 8px;
+            transition: all .15s
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: var(--border-subtle)
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: .6rem
+        }
+
+        .btn-ghost {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            padding: .45rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-soft);
+            transition: all .15s
+        }
+
+        .btn-ghost:hover {
+            color: var(--text-primary);
+            border-color: var(--border-medium);
+            background: var(--bg-tertiary)
+        }
+
+        .btn-nav-cta {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            padding: .45rem 1.2rem;
+            border-radius: 8px;
+            background: var(--accent);
+            box-shadow: 0 2px 8px var(--accent-mid);
+            transition: all .15s
+        }
+
+        .btn-nav-cta:hover {
+            filter: brightness(1.12);
+            transform: translateY(-1px)
+        }
+
+        .theme-toggle-nav {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            display: grid;
+            place-items: center;
+            color: var(--text-secondary);
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-soft);
+            transition: all .15s
+        }
+
+        .theme-toggle-nav:hover {
+            color: var(--text-primary)
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            padding: .4rem;
+            border-radius: 6px
+        }
+
+        .hamburger span {
+            width: 18px;
+            height: 1.5px;
+            background: var(--text-secondary);
+            border-radius: 2px;
+            display: block;
+            transition: .2s
+        }
+
+        .nav-mobile {
+            display: none;
+            position: fixed;
+            top: 64px;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-soft);
+            padding: 1rem max(1rem, 4vw);
+            flex-direction: column;
+            gap: .4rem;
+            z-index: 899
+        }
+
+        .nav-mobile.open {
+            display: flex
+        }
+
+        .nav-mobile .nav-link {
+            padding: .55rem .75rem
+        }
+
+        /* ── HERO ── */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 6rem max(1.5rem, 6vw) 5rem;
+            text-align: center;
+            overflow: hidden
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0
+        }
+
+        .hero-bg-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%
+        }
+
+        .hero-gradient {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 70% 60% at 50% 20%, rgba(124, 109, 255, .18) 0%, transparent 70%)
+        }
+
+        .hero-grid {
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(var(--border-subtle) 1px, transparent 1px), linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
+            background-size: 48px 48px;
+            mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, #000 30%, transparent 100%)
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 820px
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: var(--accent);
+            background: var(--accent-soft);
+            border: 1px solid var(--accent-mid);
+            padding: .35rem .9rem;
+            border-radius: 999px;
+            margin-bottom: 1.8rem;
+            animation: fadeUp .7s var(--ease-smooth) .1s both
+        }
+
+        .hero-eyebrow span {
+            font-size: 14px
+        }
+
+        .hero-title {
+            font-size: clamp(2.4rem, 6vw, 4.4rem);
+            font-weight: 800;
+            letter-spacing: -2px;
+            line-height: 1.1;
+            color: var(--text-primary);
+            margin-bottom: 1.4rem;
+            animation: fadeUp .7s var(--ease-smooth) .2s both
+        }
+
+        .hero-title em {
+            font-style: normal;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--sky) 60%, var(--green) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text
+        }
+
+        .hero-desc {
+            font-size: clamp(1rem, 2vw, 1.15rem);
+            color: var(--text-secondary);
+            max-width: 520px;
+            margin: 0 auto 2.4rem;
+            line-height: 1.7;
+            animation: fadeUp .7s var(--ease-smooth) .3s both
+        }
+
+        .hero-ctas {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            animation: fadeUp .7s var(--ease-smooth) .4s both
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            background: var(--accent);
+            padding: .75rem 1.8rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px var(--accent-mid), 0 1px 3px rgba(0, 0, 0, .3);
+            transition: all .2s var(--ease-smooth)
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.12);
+            box-shadow: 0 6px 28px var(--accent-mid)
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            background: var(--bg-card);
+            padding: .75rem 1.8rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-medium);
+            box-shadow: var(--shadow-md);
+            transition: all .2s
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-elevated);
+            transform: translateY(-1px)
+        }
+
+        .btn-primary svg,
+        .btn-secondary svg {
+            width: 16px;
+            height: 16px
+        }
+
+        /* Live ticker */
+        .ticker-wrap {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 44px;
+            border-top: 1px solid var(--border-subtle);
+            background: var(--bg-secondary);
+            overflow: hidden;
+            display: flex;
+            align-items: center
+        }
+
+        .ticker-inner {
+            display: flex;
+            gap: 3rem;
+            white-space: nowrap;
+            animation: tickerScroll 30s linear infinite
+        }
+
+        .ticker-inner:hover {
+            animation-play-state: paused
+        }
+
+        .ticker-item {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-tertiary)
+        }
+
+        .ticker-item .ti-label {
+            color: var(--text-secondary)
+        }
+
+        .ticker-item .ti-val {
+            color: var(--green);
+            font-family: var(--font-mono)
+        }
+
+        .ticker-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 6px var(--accent)
+        }
+
+        @keyframes tickerScroll {
+            from {
+                transform: translateX(0)
+            }
+
+            to {
+                transform: translateX(-50%)
+            }
+        }
+
+        /* Floating cards */
+        .hero-floaters {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none
+        }
+
+        .floater {
+            position: absolute;
+            background: var(--bg-card);
+            border: 1px solid var(--border-soft);
+            border-radius: 14px;
+            padding: 1rem 1.2rem;
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(8px);
+            font-size: 12px;
+            font-weight: 600;
+            animation: float1 6s ease-in-out infinite
+        }
+
+        .floater-1 {
+            top: 18%;
+            left: 6%;
+            animation: float1 7s ease-in-out infinite
+        }
+
+        .floater-2 {
+            top: 22%;
+            right: 6%;
+            animation: float2 8s ease-in-out 1s infinite
+        }
+
+        .floater-3 {
+            bottom: 18%;
+            left: 8%;
+            animation: float1 6.5s ease-in-out .5s infinite
+        }
+
+        .floater-4 {
+            bottom: 15%;
+            right: 7%;
+            animation: float2 7.5s ease-in-out 1.5s infinite
+        }
+
+        @keyframes float1 {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(-1deg)
+            }
+
+            50% {
+                transform: translateY(-12px) rotate(1deg)
+            }
+        }
+
+        @keyframes float2 {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(1deg)
+            }
+
+            50% {
+                transform: translateY(-10px) rotate(-1deg)
+            }
+        }
+
+        .floater-head {
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            color: var(--text-tertiary);
+            font-size: 10.5px;
+            margin-bottom: .4rem;
+            text-transform: uppercase;
+            letter-spacing: .08em
+        }
+
+        .floater-val {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -.5px
+        }
+
+        .floater-change {
+            font-size: 11px;
+            margin-top: 2px
+        }
+
+        .f-green {
+            color: var(--green)
+        }
+
+        .f-rose {
+            color: var(--rose)
+        }
+
+        .f-acc {
+            color: var(--accent)
+        }
+
+        /* Hero dashboard preview */
+        .hero-dashboard {
+            position: relative;
+            z-index: 2;
+            max-width: 900px;
+            width: calc(100% - 3rem);
+            margin: 3rem auto -6rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-soft);
+            border-radius: 20px;
+            box-shadow: var(--shadow-xl), 0 0 80px var(--accent-glow);
+            overflow: hidden;
+            animation: fadeUp .9s var(--ease-smooth) .6s both
+        }
+
+        .hd-bar {
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: .75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem
+        }
+
+        .hd-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%
+        }
+
+        .hd-dot-1 {
+            background: #ff5f57
+        }
+
+        .hd-dot-2 {
+            background: #febc2e
+        }
+
+        .hd-dot-3 {
+            background: #28c840
+        }
+
+        .hd-title {
+            margin-left: .6rem;
+            font-size: 12px;
+            color: var(--text-tertiary);
+            font-weight: 500
+        }
+
+        .hd-body {
+            padding: 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem
+        }
+
+        .hd-stat {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 1rem
+        }
+
+        .hd-stat-label {
+            font-size: 10.5px;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            color: var(--text-tertiary);
+            margin-bottom: .4rem
+        }
+
+        .hd-stat-val {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -.5px
+        }
+
+        .hd-stat-sub {
+            font-size: 10.5px;
+            margin-top: 3px;
+            font-weight: 600
+        }
+
+        .hd-bars {
+            padding: 0 1.5rem 1.5rem;
+            display: flex;
+            align-items: flex-end;
+            gap: .5rem;
+            height: 100px
+        }
+
+        .hd-bar-item {
+            flex: 1;
+            border-radius: 4px 4px 0 0;
+            transition: .3s
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0
+            }
+
+            to {
+                opacity: 1
+            }
+        }
+
+        /* ── SECTION COMMON ── */
+        section {
+            padding: 7rem max(1.5rem, 6vw)
+        }
+
+        .section-eyebrow {
+            font-size: 11.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: var(--accent);
+            margin-bottom: .9rem
+        }
+
+        .section-title {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.15;
+            margin-bottom: 1rem;
+            color: var(--text-primary)
+        }
+
+        .section-desc {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            max-width: 540px;
+            line-height: 1.7
+        }
+
+        .section-header {
+            margin-bottom: 4rem
+        }
+
+        .section-header.center {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity .7s var(--ease-smooth), transform .7s var(--ease-smooth)
+        }
+
+        .reveal.in {
+            opacity: 1;
+            transform: translateY(0)
+        }
+
+        /* ── FEATURES ── */
+        #features {
+            background: var(--bg-secondary)
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            padding: 2rem;
+            transition: all .25s var(--ease-smooth);
+            position: relative;
+            overflow: hidden
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--accent-soft), transparent 60%);
+            opacity: 0;
+            transition: .3s
+        }
+
+        .feature-card:hover {
+            border-color: var(--border-medium);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md)
+        }
+
+        .feature-card:hover::before {
+            opacity: 1
+        }
+
+        .feature-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            background: var(--accent-soft);
+            border: 1px solid var(--accent-mid);
+            display: grid;
+            place-items: center;
+            color: var(--accent);
+            margin-bottom: 1.3rem;
+            font-size: 20px;
+            transition: .2s
+        }
+
+        .feature-card:hover .feature-icon {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+            box-shadow: 0 4px 14px var(--accent-mid)
+        }
+
+        .feature-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: .5rem
+        }
+
+        .feature-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.65
+        }
+
+        .feature-link {
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--accent);
+            margin-top: 1rem;
+            opacity: 0;
+            transform: translateX(-4px);
+            transition: .2s
+        }
+
+        .feature-card:hover .feature-link {
+            opacity: 1;
+            transform: translateX(0)
+        }
+
+        /* ── STATS ── */
+        #stats {
+            background: var(--bg-primary)
+        }
+
+        .stats-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 2rem;
+            text-align: center
+        }
+
+        .stat-showcase-item {
+            padding: 2rem 1rem
+        }
+
+        .stat-number {
+            font-size: clamp(2.2rem, 5vw, 3.2rem);
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: .4rem;
+            font-variant-numeric: tabular-nums
+        }
+
+        .stat-number span {
+            background: linear-gradient(135deg, var(--accent), var(--sky));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text
+        }
+
+        .stat-label-lg {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500
+        }
+
+        /* ── HOW IT WORKS ── */
+        #how {
+            background: var(--bg-secondary)
+        }
+
+        .steps-wrap {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            position: relative
+        }
+
+        .steps-wrap::before {
+            content: '';
+            position: absolute;
+            top: 40px;
+            left: calc(100%/6);
+            right: calc(100%/6);
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-medium), transparent);
+            pointer-events: none
+        }
+
+        .step-card {
+            text-align: center;
+            padding: 1.5rem
+        }
+
+        .step-num {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 2px solid var(--border-medium);
+            display: grid;
+            place-items: center;
+            margin: 0 auto 1.3rem;
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--accent);
+            position: relative;
+            transition: .25s
+        }
+
+        .step-card:hover .step-num {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+            box-shadow: 0 4px 20px var(--accent-mid)
+        }
+
+        .step-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: .5rem
+        }
+
+        .step-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.65
+        }
+
+        /* ── TESTIMONIALS ── */
+        #testimonials {
+            background: var(--bg-primary);
+            overflow: hidden
+        }
+
+        .testimonial-track {
+            display: flex;
+            gap: 1.5rem;
+            animation: scrollLeft 30s linear infinite
+        }
+
+        .testimonial-track:hover {
+            animation-play-state: paused
+        }
+
+        .testimonial-card {
+            flex-shrink: 0;
+            width: 320px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            padding: 1.8rem;
+            transition: border-color .2s
+        }
+
+        .testimonial-card:hover {
+            border-color: var(--border-medium)
+        }
+
+        .t-stars {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 1rem;
+            font-size: 14px
+        }
+
+        .t-text {
+            font-size: 13.5px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 1.2rem;
+            font-style: italic
+        }
+
+        .t-author {
+            display: flex;
+            align-items: center;
+            gap: .7rem
+        }
+
+        .t-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: grid;
+            place-items: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0
+        }
+
+        .t-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary)
+        }
+
+        .t-role {
+            font-size: 11.5px;
+            color: var(--text-tertiary);
+            margin-top: 1px
+        }
+
+        @keyframes scrollLeft {
+            from {
+                transform: translateX(0)
+            }
+
+            to {
+                transform: translateX(-50%)
+            }
+        }
+
+        /* ── PRICING ── */
+        #pricing {
+            background: var(--bg-secondary)
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 960px;
+            margin: 0 auto
+        }
+
+        .pricing-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 2.2rem;
+            transition: all .25s
+        }
+
+        .pricing-card:hover {
+            border-color: var(--border-medium);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md)
+        }
+
+        .pricing-card.popular {
+            border-color: var(--accent-mid);
+            background: var(--bg-elevated);
+            position: relative
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: .3rem .85rem;
+            border-radius: 999px;
+            white-space: nowrap
+        }
+
+        .pricing-tier {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--text-tertiary);
+            margin-bottom: .6rem
+        }
+
+        .pricing-price {
+            font-size: 2.6rem;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: .3rem
+        }
+
+        .pricing-price sup {
+            font-size: 1rem;
+            vertical-align: top;
+            margin-top: .3rem;
+            font-weight: 600
+        }
+
+        .pricing-price sub {
+            font-size: .95rem;
+            font-weight: 500;
+            color: var(--text-secondary)
+        }
+
+        .pricing-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 1.8rem;
+            line-height: 1.55
+        }
+
+        .pricing-features {
+            display: flex;
+            flex-direction: column;
+            gap: .75rem;
+            margin-bottom: 2rem
+        }
+
+        .pf-item {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            font-size: 13px;
+            color: var(--text-primary)
+        }
+
+        .pf-check {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--green-soft);
+            color: var(--green);
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            font-size: 10px
+        }
+
+        .pf-x {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--border-subtle);
+            color: var(--text-tertiary);
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            font-size: 10px
+        }
+
+        .btn-pricing {
+            width: 100%;
+            padding: .75rem;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            transition: all .2s
+        }
+
+        .btn-pricing-outline {
+            background: transparent;
+            border: 1px solid var(--border-medium);
+            color: var(--text-primary)
+        }
+
+        .btn-pricing-outline:hover {
+            background: var(--bg-tertiary)
+        }
+
+        .btn-pricing-primary {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            box-shadow: 0 4px 16px var(--accent-mid)
+        }
+
+        .btn-pricing-primary:hover {
+            filter: brightness(1.12);
+            transform: translateY(-1px)
+        }
+
+        /* ── FAQ ── */
+        #faq {
+            background: var(--bg-primary)
+        }
+
+        .faq-wrap {
+            max-width: 680px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: .75rem
+        }
+
+        .faq-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            overflow: hidden;
+            transition: border-color .2s
+        }
+
+        .faq-item.open {
+            border-color: var(--border-medium)
+        }
+
+        .faq-question {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 1.1rem 1.4rem;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary)
+        }
+
+        .faq-icon {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-soft);
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            font-size: 13px;
+            transition: .3s;
+            color: var(--text-secondary)
+        }
+
+        .faq-item.open .faq-icon {
+            background: var(--accent-soft);
+            border-color: var(--accent-mid);
+            color: var(--accent);
+            transform: rotate(45deg)
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height .35s var(--ease-smooth), padding .35s
+        }
+
+        .faq-answer p {
+            padding: 0 1.4rem 1.2rem;
+            font-size: 13.5px;
+            color: var(--text-secondary);
+            line-height: 1.7
+        }
+
+        .faq-item.open .faq-answer {
+            max-height: 200px
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-subtle);
+            padding: 4rem max(1.5rem, 6vw) 2rem
+        }
+
+        .footer-top {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 3rem
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: .8rem
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            font-size: 16px;
+            font-weight: 800
+        }
+
+        .footer-logo-mark {
+            width: 26px;
+            height: 26px;
+            border-radius: 7px;
+            background: var(--accent);
+            display: grid;
+            place-items: center;
+            color: #fff
+        }
+
+        .footer-logo-mark svg {
+            width: 14px;
+            height: 14px
+        }
+
+        .footer-brand-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.65;
+            max-width: 280px
+        }
+
+        .footer-col-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--text-tertiary);
+            margin-bottom: 1rem
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: .5rem
+        }
+
+        .footer-link {
+            font-size: 13px;
+            color: var(--text-secondary);
+            transition: .15s
+        }
+
+        .footer-link:hover {
+            color: var(--text-primary)
+        }
+
+        .footer-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-subtle);
+            flex-wrap: wrap;
+            gap: 1rem
+        }
+
+        .footer-copy {
+            font-size: 12.5px;
+            color: var(--text-tertiary)
+        }
+
+        .footer-creator {
+            font-size: 12.5px;
+            color: var(--text-tertiary);
+            display: flex;
+            align-items: center;
+            gap: .4rem
+        }
+
+        .footer-creator strong {
+            color: var(--text-secondary)
+        }
+
+        .creator-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--accent);
+            background: var(--accent-soft);
+            border: 1px solid var(--accent-mid);
+            padding: .25rem .65rem;
+            border-radius: 999px;
+            margin-top: .8rem;
+            text-align: left
+        }
+
+        /* ── RESPONSIVE ── */
+        @media(max-width:900px) {
+
+            .nav-links,
+            .nav-actions .btn-ghost {
+                display: none
+            }
+
+            .hamburger {
+                display: flex
+            }
+
+            .steps-wrap {
+                grid-template-columns: 1fr;
+                gap: 1.5rem
+            }
+
+            .steps-wrap::before {
+                display: none
+            }
+
+            .pricing-grid {
+                grid-template-columns: 1fr
+            }
+
+            .footer-top {
+                grid-template-columns: 1fr 1fr;
+                gap: 2rem
+            }
+
+            .hero-floaters {
+                display: none
+            }
+        }
+
+        @media(max-width:640px) {
+            .pricing-grid {
+                grid-template-columns: 1fr
+            }
+
+            .footer-top {
+                grid-template-columns: 1fr
+            }
+
+            .hero-dashboard {
+                display: none
+            }
+
+            .hd-body {
+                grid-template-columns: 1fr 1fr
+            }
+
+            .stats-showcase {
+                grid-template-columns: 1fr 1fr
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr
+            }
+        }
+    </style>
 </head>
 
 <body>
+    <div id="scroll-progress"></div>
 
-    <!-- ── Toast Container ── -->
-    <div id="toast-container" aria-live="polite"></div>
-
-    <!-- ── Sidebar ── -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="logo">
-                <div class="logo-mark">
-                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                        <path d="M9 1L16.5 5.5V12.5L9 17L1.5 12.5V5.5L9 1Z" fill="currentColor" opacity="0.9" />
-                        <path d="M9 5L13 7.5V12.5L9 15L5 12.5V7.5L9 5Z" fill="var(--bg-primary)" opacity="0.8" />
-                    </svg>
-                </div>
-                <span class="logo-text">Fina</span>
-            </div>
-            <button class="sidebar-close" id="sidebar-close" aria-label="Close menu">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <a href="index.html" class="nav-logo">
+            <div class="nav-logo-mark"><svg viewBox="0 0 18 18" fill="none">
+                    <path d="M9 1L16.5 5.5V12.5L9 17L1.5 12.5V5.5L9 1Z" fill="currentColor" opacity=".9" />
+                    <path d="M9 5L13 7.5V12.5L9 15L5 12.5V7.5L9 5Z" fill="rgba(124,109,255,.3)" />
+                </svg></div>
+            Fina
+        </a>
+        <div class="nav-links">
+            <a href="#features" class="nav-link">Features</a>
+            <a href="#how" class="nav-link">How it Works</a>
+            <a href="#pricing" class="nav-link">Pricing</a>
+            <a href="#faq" class="nav-link">FAQ</a>
+        </div>
+        <div class="nav-actions">
+            <button class="theme-toggle-nav" id="theme-toggle" title="Toggle theme">
+                <svg id="sun-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
+                    <circle cx="7.5" cy="7.5" r="3" stroke="currentColor" stroke-width="1.5" />
+                    <path
+                        d="M7.5 1V2.5M7.5 12.5V14M14 7.5H12.5M2.5 7.5H1M12.4 2.6L11.3 3.7M3.7 11.3L2.6 12.4M12.4 12.4L11.3 11.3M3.7 3.7L2.6 2.6"
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                </svg>
+                <svg id="moon-icon" style="display:none" width="15" height="15" viewBox="0 0 15 15" fill="none">
+                    <path
+                        d="M12 9.5C11 10 9.8 10.3 8.5 10.3C5.4 10.3 3 7.9 3 4.8C3 3.5 3.4 2.3 4.1 1.3C2.2 2.2 1 4.2 1 6.5C1 9.8 3.7 12.5 7 12.5C9.3 12.5 11.3 11.3 12 9.5Z"
+                        fill="currentColor" />
                 </svg>
             </button>
+            <a href="login.html" class="btn-ghost">Sign in</a>
+            <a href="register.html" class="btn-nav-cta">Get Started</a>
+            <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+        </div>
+    </nav>
+    <div class="nav-mobile" id="nav-mobile">
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#how" class="nav-link">How it Works</a>
+        <a href="#pricing" class="nav-link">Pricing</a>
+        <a href="#faq" class="nav-link">FAQ</a>
+        <a href="login.html" class="nav-link">Sign in</a>
+        <a href="register.html" class="btn-primary" style="justify-content:center;margin-top:.5rem">Get Started Free</a>
+    </div>
+
+    <!-- Hero -->
+    <section class="hero" id="hero">
+        <div class="hero-bg">
+            <canvas class="hero-bg-canvas" id="hero-canvas"></canvas>
+            <div class="hero-gradient"></div>
+            <div class="hero-grid"></div>
         </div>
 
-        <nav class="sidebar-nav">
-            <div class="nav-section">
-                <span class="nav-label">Overview</span>
-                <a href="#" class="nav-item active" data-page="dashboard">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor" />
-                        <rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.4" />
-                        <rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.4" />
-                        <rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.7" />
-                    </svg>
-                    Dashboard
-                </a>
-                <a href="#" class="nav-item" data-page="analytics">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M1 12L5 7L8 9.5L12 5L15 7" stroke="currentColor" stroke-width="1.5"
-                            stroke-linecap="round" stroke-linejoin="round" />
-                        <path d="M1 14H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                            opacity="0.4" />
-                    </svg>
-                    Analytics
-                </a>
+        <!-- Floating cards -->
+        <div class="hero-floaters">
+            <div class="floater floater-1">
+                <div class="floater-head">💳 Total Balance</div>
+                <div class="floater-val">$24,850</div>
+                <div class="floater-change f-green">↑ +2.4% this month</div>
             </div>
+            <div class="floater floater-2">
+                <div class="floater-head">📊 Savings Rate</div>
+                <div class="floater-val">61.9%</div>
+                <div class="floater-change f-acc">↑ 4.2% improvement</div>
+            </div>
+            <div class="floater floater-3">
+                <div class="floater-head">🛍️ Shopping</div>
+                <div class="floater-val">$480</div>
+                <div class="floater-change f-rose">↑ 12% vs last month</div>
+            </div>
+            <div class="floater floater-4">
+                <div class="floater-head">🏖️ Vacation Goal</div>
+                <div class="floater-val">73%</div>
+                <div class="floater-change f-green">$1,350 to go</div>
+            </div>
+        </div>
 
-            <div class="nav-section">
-                <span class="nav-label">Finances</span>
-                <a href="#" class="nav-item" data-page="expenses">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5" />
-                        <path d="M1 7H15" stroke="currentColor" stroke-width="1.5" />
-                        <circle cx="5" cy="10" r="1" fill="currentColor" />
-                    </svg>
-                    Expenses
-                </a>
-                <a href="#" class="nav-item" data-page="budgets">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5" />
-                        <path d="M8 4.5V8L10.5 9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+        <div class="hero-content">
+            <div class="hero-eyebrow"><span>✨</span> Smart Financial Intelligence</div>
+            <h1 class="hero-title">
+                Take Control of Your<br /><em>Financial Future</em>
+            </h1>
+            <p class="hero-desc">Fina gives you a complete picture of your money — track expenses, plan budgets, hit
+                savings goals, and get AI-powered insights that actually move the needle.</p>
+            <div class="hero-ctas">
+                <a href="register.html" class="btn-primary">
+                    <svg viewBox="0 0 16 16" fill="none">
+                        <path d="M8 1L15 8L8 15M1 8H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                             stroke-linejoin="round" />
                     </svg>
-                    Budgets
+                    Start for Free
                 </a>
-                <a href="#" class="nav-item" data-page="goals">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M8 1L10 6H15L11 9.5L12.5 14.5L8 11.5L3.5 14.5L5 9.5L1 6H6L8 1Z" stroke="currentColor"
-                            stroke-width="1.5" stroke-linejoin="round" />
-                    </svg>
-                    Goals
-                </a>
-            </div>
-
-            <div class="nav-section">
-                <span class="nav-label">Activity</span>
-                <a href="#" class="nav-item" data-page="timeline">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <circle cx="4" cy="4" r="1.5" fill="currentColor" />
-                        <circle cx="4" cy="8" r="1.5" fill="currentColor" opacity="0.6" />
-                        <circle cx="4" cy="12" r="1.5" fill="currentColor" opacity="0.3" />
-                        <path d="M7 4H15M7 8H13M7 12H11" stroke="currentColor" stroke-width="1.5"
-                            stroke-linecap="round" />
-                    </svg>
-                    Timeline
-                </a>
-                <a href="#" class="nav-item" data-page="settings">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.5" />
+                <a href="#how" class="btn-secondary">
+                    <svg viewBox="0 0 16 16" fill="none">
+                        <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5" />
                         <path
-                            d="M8 1.5V3M8 13V14.5M14.5 8H13M3 8H1.5M12.9 3.1L11.8 4.2M4.2 11.8L3.1 12.9M12.9 12.9L11.8 11.8M4.2 4.2L3.1 3.1"
+                            d="M6.5 6C6.5 5.17 7.17 4.5 8 4.5C8.83 4.5 9.5 5.17 9.5 6C9.5 7.5 7.5 8 7.5 9.5H8.5M8 11.5H8.01"
                             stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                     </svg>
-                    Settings
+                    See how it works
                 </a>
             </div>
-        </nav>
+        </div>
 
-        <div class="sidebar-footer">
-            <div class="user-card">
-                <div class="user-avatar">
-                    <span>AJ</span>
+        <!-- Dashboard preview -->
+        <div class="hero-dashboard reveal">
+            <div class="hd-bar">
+                <div class="hd-dot hd-dot-1"></div>
+                <div class="hd-dot hd-dot-2"></div>
+                <div class="hd-dot hd-dot-3"></div>
+                <span class="hd-title">fina.app — Dashboard</span>
+            </div>
+            <div class="hd-body">
+                <div class="hd-stat">
+                    <div class="hd-stat-label">Total Balance</div>
+                    <div class="hd-stat-val" style="color:var(--text-primary)">$24,850</div>
+                    <div class="hd-stat-sub" style="color:var(--green)">↑ +$580 this month</div>
                 </div>
-                <div class="user-info">
-                    <span class="user-name">Alex Johnson</span>
-                    <span class="user-plan">Pro Plan</span>
+                <div class="hd-stat">
+                    <div class="hd-stat-label">Monthly Income</div>
+                    <div class="hd-stat-val" style="color:var(--green)">$8,500</div>
+                    <div class="hd-stat-sub" style="color:var(--text-tertiary)">Salary + Freelance</div>
                 </div>
-                <div class="user-status"></div>
+                <div class="hd-stat">
+                    <div class="hd-stat-label">Monthly Spent</div>
+                    <div class="hd-stat-val" style="color:var(--rose)">$3,240</div>
+                    <div class="hd-stat-sub" style="color:var(--rose)">↑ 12% vs last month</div>
+                </div>
+                <div class="hd-stat">
+                    <div class="hd-stat-label">Savings Rate</div>
+                    <div class="hd-stat-val" style="color:var(--accent)">61.9%</div>
+                    <div class="hd-stat-sub" style="color:var(--green)">↑ 4.2% improvement</div>
+                </div>
+            </div>
+            <div class="hd-bars" id="hd-bars"></div>
+        </div>
+
+        <!-- Live ticker -->
+        <div class="ticker-wrap">
+            <div class="ticker-inner" id="ticker-inner">
+                <!-- JS populated -->
             </div>
         </div>
-    </aside>
+    </section>
 
-    <!-- ── Main Content ── -->
-    <main class="main-content" id="main-content">
-
-        <!-- Top Bar -->
-        <header class="topbar">
-            <div class="topbar-left">
-                <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
-                    <span></span><span></span><span></span>
-                </button>
-                <div class="page-breadcrumb" id="page-title">Dashboard</div>
-            </div>
-            <div class="topbar-right">
-                <div class="search-wrapper" id="search-wrapper">
-                    <svg class="search-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5" />
-                        <path d="M10 10L13 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                    </svg>
-                    <input type="text" class="search-input" id="global-search" placeholder="Search expenses…" />
-                    <kbd>⌘K</kbd>
-                </div>
-                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
-                    <svg class="sun-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
-                        <circle cx="7.5" cy="7.5" r="3" stroke="currentColor" stroke-width="1.5" />
-                        <path
-                            d="M7.5 1V2.5M7.5 12.5V14M14 7.5H12.5M2.5 7.5H1M12.4 2.6L11.3 3.7M3.7 11.3L2.6 12.4M12.4 12.4L11.3 11.3M3.7 3.7L2.6 2.6"
-                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                    </svg>
-                    <svg class="moon-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
-                        <path
-                            d="M12 9.5C11 10 9.8 10.3 8.5 10.3C5.4 10.3 3 7.9 3 4.8C3 3.5 3.4 2.3 4.1 1.3C2.2 2.2 1 4.2 1 6.5C1 9.8 3.7 12.5 7 12.5C9.3 12.5 11.3 11.3 12 9.5Z"
-                            fill="currentColor" />
-                    </svg>
-                </button>
-                <button class="add-expense-btn" id="add-expense-trigger">
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <path d="M7 1V13M1 7H13" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                    </svg>
-                    Add Expense
-                </button>
-            </div>
-        </header>
-
-        <!-- ══ PAGE: DASHBOARD ══ -->
-        <section class="page active" id="page-dashboard">
-
-            <div class="page-header">
-                <div>
-                    <h1 class="page-title">Good morning, Saloni Agalawe </h1>
-                    <p class="page-subtitle">Here's your financial snapshot for <span id="current-date"></span></p>
-                </div>
-                <div class="header-actions">
-                    <button class="btn-outline" id="export-btn">
-                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                            <path d="M7 1V9M4 6L7 9L10 6" stroke="currentColor" stroke-width="1.5"
-                                stroke-linecap="round" stroke-linejoin="round" />
-                            <path d="M1 11H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                        </svg>
-                        Export
-                    </button>
-                </div>
-            </div>
-
-            <!-- Balance & Stats Row -->
-            <div class="stats-grid">
-                <div class="stat-card balance-card">
-                    <div class="stat-card-header">
-                        <span class="stat-label">Total Balance</span>
-                        <div class="stat-badge positive">+2.4%</div>
-                    </div>
-                    <div class="stat-value" data-count="24850" data-prefix="$" data-decimals="2">$0.00</div>
-                    <div class="stat-sub">
-                        <span class="sub-value positive">↑ $580.00</span>
-                        <span class="sub-label">vs last month</span>
-                    </div>
-                    <div class="balance-sparkline">
-                        <svg viewBox="0 0 200 60" preserveAspectRatio="none" fill="none">
-                            <path class="sparkline-fill"
-                                d="M0 50 C20 45 35 30 50 35 C65 40 75 20 95 18 C115 16 125 28 145 22 C165 16 175 8 200 5 L200 60 L0 60Z" />
-                            <path class="sparkline-line"
-                                d="M0 50 C20 45 35 30 50 35 C65 40 75 20 95 18 C115 16 125 28 145 22 C165 16 175 8 200 5" />
-                        </svg>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <span class="stat-label">Monthly Income</span>
-                        <div class="stat-icon income-icon">
-                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                                <path d="M7 11V3M4 6L7 3L10 6" stroke="currentColor" stroke-width="1.5"
-                                    stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="stat-value" data-count="8500" data-prefix="$" data-decimals="2">$0.00</div>
-                    <div class="stat-sub">
-                        <span class="sub-label">Salary + Freelance</span>
-                    </div>
-                    <div class="stat-bar-wrap">
-                        <div class="stat-bar" style="--fill: 85%; --color: var(--accent-green)"></div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <span class="stat-label">Monthly Spent</span>
-                        <div class="stat-icon expense-icon">
-                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                                <path d="M7 3V11M4 8L7 11L10 8" stroke="currentColor" stroke-width="1.5"
-                                    stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="stat-value" data-count="3240" data-prefix="$" data-decimals="2">$0.00</div>
-                    <div class="stat-sub">
-                        <span class="sub-value negative">↑ 12%</span>
-                        <span class="sub-label">vs last month</span>
-                    </div>
-                    <div class="stat-bar-wrap">
-                        <div class="stat-bar" style="--fill: 38%; --color: var(--accent-rose)"></div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <span class="stat-label">Savings Rate</span>
-                        <div class="stat-icon savings-icon">
-                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                                <path d="M2 10C2 7.8 3.8 6 6 6H9C10.7 6 12 7.3 12 9V10" stroke="currentColor"
-                                    stroke-width="1.5" stroke-linecap="round" />
-                                <circle cx="7" cy="4" r="2" stroke="currentColor" stroke-width="1.5" />
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="stat-value" data-count="61.9" data-suffix="%" data-decimals="1">0%</div>
-                    <div class="stat-sub">
-                        <span class="sub-value positive">↑ 4.2%</span>
-                        <span class="sub-label">improvement</span>
-                    </div>
-                    <div class="stat-bar-wrap">
-                        <div class="stat-bar" style="--fill: 61.9%; --color: var(--accent-violet)"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Main Dashboard Grid -->
-            <div class="dashboard-grid">
-
-                <!-- Recent Transactions -->
-                <div class="card transactions-card">
-                    <div class="card-header">
-                        <h3 class="card-title">Recent Transactions</h3>
-                        <button class="card-action" data-page="expenses">View all</button>
-                    </div>
-                    <div class="transactions-list" id="recent-transactions">
-                        <!-- Populated by JS -->
-                    </div>
-                </div>
-
-                <!-- Donut Chart -->
-                <div class="card chart-card">
-                    <div class="card-header">
-                        <h3 class="card-title">Spending by Category</h3>
-                        <select class="card-select" id="chart-period">
-                            <option value="month">This Month</option>
-                            <option value="quarter">Quarter</option>
-                            <option value="year">Year</option>
-                        </select>
-                    </div>
-                    <div class="donut-wrap">
-                        <svg class="donut-chart" id="donut-chart" viewBox="0 0 200 200">
-                            <!-- Populated by JS -->
-                        </svg>
-                        <div class="donut-center">
-                            <span class="donut-amount" id="donut-total">$0</span>
-                            <span class="donut-label">Total Spent</span>
-                        </div>
-                    </div>
-                    <div class="chart-legend" id="chart-legend"></div>
-                </div>
-
-                <!-- Monthly Trend -->
-                <div class="card trend-card">
-                    <div class="card-header">
-                        <h3 class="card-title">Spending Trend</h3>
-                        <div class="trend-toggles">
-                            <button class="trend-btn active" data-type="expenses">Expenses</button>
-                            <button class="trend-btn" data-type="income">Income</button>
-                        </div>
-                    </div>
-                    <div class="bar-chart-wrap" id="bar-chart">
-                        <!-- Populated by JS -->
-                    </div>
-                </div>
-
-                <!-- Insights -->
-                <div class="card insights-card">
-                    <div class="card-header">
-                        <h3 class="card-title">Smart Insights</h3>
-                        <span class="badge-new">AI</span>
-                    </div>
-                    <div class="insights-list" id="insights-list">
-                        <!-- Populated by JS -->
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- ══ PAGE: ANALYTICS ══ -->
-        <section class="page" id="page-analytics">
-            <div class="page-header">
-                <div>
-                    <h1 class="page-title">Analytics</h1>
-                    <p class="page-subtitle">Deep dive into your spending patterns</p>
-                </div>
-                <div class="period-selector">
-                    <button class="period-btn active" data-period="month">Month</button>
-                    <button class="period-btn" data-period="quarter">Quarter</button>
-                    <button class="period-btn" data-period="year">Year</button>
-                </div>
-            </div>
-
-            <div class="analytics-grid">
-                <div class="card analytics-main-chart">
-                    <div class="card-header">
-                        <h3 class="card-title">Income vs Expenses</h3>
-                        <div class="chart-legend-inline">
-                            <span class="legend-dot" style="--c: var(--accent-green)"></span><span>Income</span>
-                            <span class="legend-dot" style="--c: var(--accent-rose)"></span><span>Expenses</span>
-                        </div>
-                    </div>
-                    <div class="area-chart-wrap" id="area-chart"></div>
-                </div>
-
-                <div class="card category-breakdown-card">
-                    <div class="card-header">
-                        <h3 class="card-title">Category Breakdown</h3>
-                    </div>
-                    <div class="category-bars" id="category-bars"></div>
-                </div>
-
-                <div class="card monthly-comparison-card">
-                    <div class="card-header">
-                        <h3 class="card-title">Monthly Comparison</h3>
-                    </div>
-                    <div class="comparison-grid" id="monthly-comparison"></div>
-                </div>
-
-                <div class="card top-merchants-card">
-                    <div class="card-header">
-                        <h3 class="card-title">Top Merchants</h3>
-                    </div>
-                    <div class="merchants-list" id="top-merchants"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ══ PAGE: EXPENSES ══ -->
-        <section class="page" id="page-expenses">
-            <div class="page-header">
-                <div>
-                    <h1 class="page-title">Expenses</h1>
-                    <p class="page-subtitle"><span id="expense-count">0</span> transactions recorded</p>
-                </div>
-                <button class="btn-primary" id="add-expense-trigger2">
-                    <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                        <path d="M7 1V13M1 7H13" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                    </svg>
-                    New Expense
-                </button>
-            </div>
-
-            <div class="expense-controls">
-                <div class="search-bar-full">
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5" />
-                        <path d="M10 10L13 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                    </svg>
-                    <input type="text" id="expense-search" placeholder="Search by name, category, amount…" />
-                </div>
-                <div class="filter-row">
-                    <select id="filter-category" class="filter-select">
-                        <option value="">All Categories</option>
-                    </select>
-                    <select id="filter-sort" class="filter-select">
-                        <option value="date-desc">Latest First</option>
-                        <option value="date-asc">Oldest First</option>
-                        <option value="amount-desc">Highest Amount</option>
-                        <option value="amount-asc">Lowest Amount</option>
-                    </select>
-                    <input type="month" id="filter-month" class="filter-select" />
-                </div>
-            </div>
-
-            <div class="expenses-table-wrap">
-                <table class="expenses-table">
-                    <thead>
-                        <tr>
-                            <th>Transaction</th>
-                            <th>Category</th>
-                            <th>Date</th>
-                            <th>Amount</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="expenses-table-body">
-                        <!-- Populated by JS -->
-                    </tbody>
-                </table>
-                <div class="empty-state" id="expenses-empty" style="display:none">
-                    <div class="empty-icon">
-                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-                            <rect x="6" y="8" width="28" height="24" rx="3" stroke="currentColor" stroke-width="1.5"
-                                opacity="0.3" />
-                            <path d="M13 16H27M13 20H22M13 24H18" stroke="currentColor" stroke-width="1.5"
-                                stroke-linecap="round" opacity="0.5" />
-                        </svg>
-                    </div>
-                    <h4>No expenses found</h4>
-                    <p>Add your first expense to start tracking</p>
-                    <button class="btn-primary" id="empty-add-btn">Add Expense</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- ══ PAGE: BUDGETS ══ -->
-        <section class="page" id="page-budgets">
-            <div class="page-header">
-                <div>
-                    <h1 class="page-title">Budgets</h1>
-                    <p class="page-subtitle">Set limits. Stay on track.</p>
-                </div>
-                <button class="btn-primary" id="add-budget-btn">
-                    <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                        <path d="M7 1V13M1 7H13" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                    </svg>
-                    New Budget
-                </button>
-            </div>
-            <div class="budgets-grid" id="budgets-grid">
-                <!-- Populated by JS -->
-            </div>
-        </section>
-
-        <!-- ══ PAGE: GOALS ══ -->
-        <section class="page" id="page-goals">
-            <div class="page-header">
-                <div>
-                    <h1 class="page-title">Savings Goals</h1>
-                    <p class="page-subtitle">Track your milestones and celebrate wins</p>
-                </div>
-                <button class="btn-primary" id="add-goal-btn">
-                    <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                        <path d="M7 1V13M1 7H13" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                    </svg>
-                    New Goal
-                </button>
-            </div>
-            <div class="goals-grid" id="goals-grid">
-                <!-- Populated by JS -->
-            </div>
-        </section>
-
-        <!-- ══ PAGE: TIMELINE ══ -->
-        <section class="page" id="page-timeline">
-            <div class="page-header">
-                <div>
-                    <h1 class="page-title">Activity Timeline</h1>
-                    <p class="page-subtitle">Your complete financial history</p>
-                </div>
-            </div>
-            <div class="timeline-filter-row">
-                <select id="timeline-category-filter" class="filter-select">
-                    <option value="">All Categories</option>
-                </select>
-                <select id="timeline-sort" class="filter-select">
-                    <option value="date-desc">Newest First</option>
-                    <option value="date-asc">Oldest First</option>
-                </select>
-            </div>
-            <div class="timeline-wrap" id="timeline-wrap">
-                <!-- Populated by JS -->
-            </div>
-        </section>
-
-        <!-- ══ PAGE: SETTINGS ══ -->
-        <section class="page" id="page-settings">
-            <div class="page-header">
-                <div>
-                    <h1 class="page-title">Settings</h1>
-                    <p class="page-subtitle">Customize your Fina experience</p>
-                </div>
-            </div>
-            <div class="settings-grid">
-                <div class="settings-card">
-                    <h3 class="settings-section-title">Appearance</h3>
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-name">Theme</span>
-                            <span class="setting-desc">Choose between light and dark mode</span>
-                        </div>
-                        <div class="theme-selector">
-                            <button class="theme-opt" data-t="dark" id="theme-dark">
-                                <svg width="16" height="16" viewBox="0 0 15 15" fill="none">
-                                    <path
-                                        d="M12 9.5C11 10 9.8 10.3 8.5 10.3C5.4 10.3 3 7.9 3 4.8C3 3.5 3.4 2.3 4.1 1.3C2.2 2.2 1 4.2 1 6.5C1 9.8 3.7 12.5 7 12.5C9.3 12.5 11.3 11.3 12 9.5Z"
-                                        fill="currentColor" />
-                                </svg>
-                                Dark
-                            </button>
-                            <button class="theme-opt" data-t="light" id="theme-light">
-                                <svg width="16" height="16" viewBox="0 0 15 15" fill="none">
-                                    <circle cx="7.5" cy="7.5" r="3" stroke="currentColor" stroke-width="1.5" />
-                                    <path d="M7.5 1V2.5M7.5 12.5V14M14 7.5H12.5M2.5 7.5H1" stroke="currentColor"
-                                        stroke-width="1.5" stroke-linecap="round" />
-                                </svg>
-                                Light
-                            </button>
-                        </div>
-                    </div>
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-name">Accent Color</span>
-                            <span class="setting-desc">Personalize your accent color</span>
-                        </div>
-                        <div class="accent-swatches">
-                            <button class="swatch active" data-accent="violet" style="--sc: #8b5cf6"></button>
-                            <button class="swatch" data-accent="emerald" style="--sc: #10b981"></button>
-                            <button class="swatch" data-accent="amber" style="--sc: #f59e0b"></button>
-                            <button class="swatch" data-accent="rose" style="--sc: #f43f5e"></button>
-                            <button class="swatch" data-accent="sky" style="--sc: #0ea5e9"></button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="settings-card">
-                    <h3 class="settings-section-title">Preferences</h3>
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-name">Currency</span>
-                            <span class="setting-desc">Display currency for all values</span>
-                        </div>
-                        <select class="filter-select" id="currency-select">
-                            <option value="$">USD ($)</option>
-                            <option value="€">EUR (€)</option>
-                            <option value="£">GBP (£)</option>
-                            <option value="¥">JPY (¥)</option>
-                            <option value="₹">INR (₹)</option>
-                        </select>
-                    </div>
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-name">Name</span>
-                            <span class="setting-desc">Your display name</span>
-                        </div>
-                        <input type="text" class="setting-input" id="user-name-input" value="Alex Johnson" />
-                    </div>
-                </div>
-
-                <div class="settings-card danger-card">
-                    <h3 class="settings-section-title">Data</h3>
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <span class="setting-name">Reset All Data</span>
-                            <span class="setting-desc">Clear all expenses, budgets, and goals</span>
-                        </div>
-                        <button class="btn-danger" id="reset-data-btn">Reset</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- ══ MODAL: Add/Edit Expense ══ -->
-    <div class="modal-overlay" id="expense-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <div class="modal">
-            <div class="modal-header">
-                <h2 class="modal-title" id="modal-title">New Expense</h2>
-                <button class="modal-close" id="modal-close" aria-label="Close">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="1.5"
-                            stroke-linecap="round" />
-                    </svg>
-                </button>
-            </div>
-            <form class="modal-form" id="expense-form" autocomplete="off">
-                <input type="hidden" id="expense-id" />
-
-                <div class="form-group">
-                    <label class="form-label">Description</label>
-                    <input type="text" class="form-input" id="expense-name" placeholder="e.g. Netflix Subscription"
-                        required />
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Amount</label>
-                        <div class="input-prefix-wrap">
-                            <span class="input-prefix" id="currency-symbol">$</span>
-                            <input type="number" class="form-input prefix-input" id="expense-amount" placeholder="0.00"
-                                step="0.01" min="0.01" required />
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Date</label>
-                        <input type="date" class="form-input" id="expense-date" required />
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Category</label>
-                        <select class="form-input" id="expense-category" required>
-                            <option value="">Select category</option>
-                            <option value="Food & Dining">🍔 Food & Dining</option>
-                            <option value="Transportation">🚗 Transportation</option>
-                            <option value="Shopping">🛍️ Shopping</option>
-                            <option value="Entertainment">🎬 Entertainment</option>
-                            <option value="Healthcare">💊 Healthcare</option>
-                            <option value="Utilities">⚡ Utilities</option>
-                            <option value="Housing">🏠 Housing</option>
-                            <option value="Education">📚 Education</option>
-                            <option value="Travel">✈️ Travel</option>
-                            <option value="Other">💼 Other</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Type</label>
-                        <select class="form-input" id="expense-type">
-                            <option value="expense">Expense</option>
-                            <option value="income">Income</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Note <span class="optional">(optional)</span></label>
-                    <input type="text" class="form-input" id="expense-note" placeholder="Any additional details…" />
-                </div>
-
-                <div class="modal-actions">
-                    <button type="button" class="btn-outline" id="modal-cancel">Cancel</button>
-                    <button type="submit" class="btn-primary" id="modal-submit">Save Expense</button>
-                </div>
-            </form>
+    <!-- Features -->
+    <section id="features">
+        <div class="section-header center reveal">
+            <div class="section-eyebrow">What Fina Offers</div>
+            <h2 class="section-title">Everything you need to manage money</h2>
+            <p class="section-desc">From daily expense logging to long-term goal tracking — one elegant app that grows
+                with your financial life.</p>
         </div>
-    </div>
-
-    <!-- ══ MODAL: Budget ══ -->
-    <div class="modal-overlay" id="budget-modal" role="dialog" aria-modal="true">
-        <div class="modal">
-            <div class="modal-header">
-                <h2 class="modal-title">New Budget</h2>
-                <button class="modal-close" id="budget-modal-close">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="1.5"
-                            stroke-linecap="round" />
-                    </svg>
-                </button>
+        <div class="features-grid">
+            <div class="feature-card reveal">
+                <div class="feature-icon">📊</div>
+                <div class="feature-name">Real-Time Analytics</div>
+                <p class="feature-desc">Interactive charts and visual breakdowns that turn raw transactions into
+                    crystal-clear spending patterns. Daily, weekly, monthly — your data your way.</p>
+                <span class="feature-link">Explore →</span>
             </div>
-            <form class="modal-form" id="budget-form" autocomplete="off">
-                <div class="form-group">
-                    <label class="form-label">Category</label>
-                    <select class="form-input" id="budget-category" required>
-                        <option value="">Select category</option>
-                        <option value="Food & Dining">🍔 Food & Dining</option>
-                        <option value="Transportation">🚗 Transportation</option>
-                        <option value="Shopping">🛍️ Shopping</option>
-                        <option value="Entertainment">🎬 Entertainment</option>
-                        <option value="Healthcare">💊 Healthcare</option>
-                        <option value="Utilities">⚡ Utilities</option>
-                        <option value="Housing">🏠 Housing</option>
-                        <option value="Education">📚 Education</option>
-                        <option value="Travel">✈️ Travel</option>
-                        <option value="Other">💼 Other</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Monthly Limit</label>
-                    <div class="input-prefix-wrap">
-                        <span class="input-prefix">$</span>
-                        <input type="number" class="form-input prefix-input" id="budget-limit" placeholder="500.00"
-                            step="0.01" min="1" required />
-                    </div>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn-outline" id="budget-cancel">Cancel</button>
-                    <button type="submit" class="btn-primary">Create Budget</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- ══ MODAL: Goal ══ -->
-    <div class="modal-overlay" id="goal-modal" role="dialog" aria-modal="true">
-        <div class="modal">
-            <div class="modal-header">
-                <h2 class="modal-title">New Savings Goal</h2>
-                <button class="modal-close" id="goal-modal-close">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="1.5"
-                            stroke-linecap="round" />
-                    </svg>
-                </button>
+            <div class="feature-card reveal">
+                <div class="feature-icon">🎯</div>
+                <div class="feature-name">Budget Planning</div>
+                <p class="feature-desc">Set smart monthly limits per category. Get proactive alerts before you
+                    overspend, not after. Stay ahead of your money, not behind it.</p>
+                <span class="feature-link">Explore →</span>
             </div>
-            <form class="modal-form" id="goal-form" autocomplete="off">
-                <div class="form-group">
-                    <label class="form-label">Goal Name</label>
-                    <input type="text" class="form-input" id="goal-name" placeholder="e.g. Emergency Fund" required />
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Target Amount</label>
-                        <div class="input-prefix-wrap">
-                            <span class="input-prefix">$</span>
-                            <input type="number" class="form-input prefix-input" id="goal-target" placeholder="10000"
-                                min="1" required />
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Current Saved</label>
-                        <div class="input-prefix-wrap">
-                            <span class="input-prefix">$</span>
-                            <input type="number" class="form-input prefix-input" id="goal-current" placeholder="0"
-                                min="0" />
-                        </div>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Target Date</label>
-                        <input type="date" class="form-input" id="goal-date" />
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Icon</label>
-                        <select class="form-input" id="goal-icon">
-                            <option value="🏖️">🏖️ Vacation</option>
-                            <option value="🏠">🏠 Home</option>
-                            <option value="🚗">🚗 Car</option>
-                            <option value="📱">📱 Gadget</option>
-                            <option value="🎓">🎓 Education</option>
-                            <option value="💍">💍 Wedding</option>
-                            <option value="🛡️">🛡️ Emergency</option>
-                            <option value="💰">💰 Investment</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn-outline" id="goal-cancel">Cancel</button>
-                    <button type="submit" class="btn-primary">Create Goal</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- ══ Confirm Dialog ══ -->
-    <div class="modal-overlay" id="confirm-modal" role="dialog" aria-modal="true">
-        <div class="modal confirm-modal">
-            <div class="confirm-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 9V13M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" />
-                </svg>
+            <div class="feature-card reveal">
+                <div class="feature-icon">🏆</div>
+                <div class="feature-name">Savings Goals</div>
+                <p class="feature-desc">Create milestone-based savings goals — vacation fund, emergency buffer, dream
+                    gadget — and watch your progress with satisfying visual trackers.</p>
+                <span class="feature-link">Explore →</span>
             </div>
-            <h3 class="confirm-title" id="confirm-title">Delete Expense?</h3>
-            <p class="confirm-body" id="confirm-body">This action cannot be undone.</p>
-            <div class="modal-actions">
-                <button class="btn-outline" id="confirm-cancel">Cancel</button>
-                <button class="btn-danger" id="confirm-ok">Delete</button>
+            <div class="feature-card reveal">
+                <div class="feature-icon">🤖</div>
+                <div class="feature-name">AI-Powered Insights</div>
+                <p class="feature-desc">Smart recommendations based on your actual spending behavior. Discover where
+                    your money really goes and get actionable suggestions to improve.</p>
+                <span class="feature-link">Explore →</span>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon">📱</div>
+                <div class="feature-name">Fully Responsive</div>
+                <p class="feature-desc">Pixel-perfect experience on every device. Track an expense on your phone,
+                    analyze the data on your laptop — seamlessly synced via localStorage.</p>
+                <span class="feature-link">Explore →</span>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon">🌓</div>
+                <div class="feature-name">Dark & Light Modes</div>
+                <p class="feature-desc">Five accent colors, two themes, your choice. Fina adapts to your aesthetic so
+                    your finance dashboard feels like yours, not a generic tool.</p>
+                <span class="feature-link">Explore →</span>
             </div>
         </div>
-    </div>
+    </section>
 
-    <script src="app.js"></script>
+    <!-- Stats -->
+    <section id="stats">
+        <div class="stats-showcase">
+            <div class="stat-showcase-item reveal">
+                <div class="stat-number"><span id="stat-users">0</span>K+</div>
+                <div class="stat-label-lg">Active Users</div>
+            </div>
+            <div class="stat-showcase-item reveal">
+                <div class="stat-number"><span id="stat-txns">0</span>M+</div>
+                <div class="stat-label-lg">Transactions Tracked</div>
+            </div>
+            <div class="stat-showcase-item reveal">
+                <div class="stat-number">$<span id="stat-saved">0</span>M+</div>
+                <div class="stat-label-lg">Money Saved by Users</div>
+            </div>
+            <div class="stat-showcase-item reveal">
+                <div class="stat-number"><span id="stat-rating">0</span>/5</div>
+                <div class="stat-label-lg">Average Rating</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it works -->
+    <section id="how">
+        <div class="section-header center reveal">
+            <div class="section-eyebrow">Getting Started</div>
+            <h2 class="section-title">Up and running in 3 minutes</h2>
+            <p class="section-desc">No complex setup. No bank integrations required. Just a clean, fast experience from
+                day one.</p>
+        </div>
+        <div class="steps-wrap">
+            <div class="step-card reveal">
+                <div class="step-num">1</div>
+                <h3 class="step-title">Create your account</h3>
+                <p class="step-desc">Sign up in seconds with just your name and email. Your data stays private — stored
+                    securely in your browser, always under your control.</p>
+            </div>
+            <div class="step-card reveal">
+                <div class="step-num">2</div>
+                <h3 class="step-title">Log your expenses</h3>
+                <p class="step-desc">Add expenses quickly with categories, dates, and notes. Set up monthly budgets per
+                    category and create savings goals that motivate you.</p>
+            </div>
+            <div class="step-card reveal">
+                <div class="step-num">3</div>
+                <h3 class="step-title">Get smart insights</h3>
+                <p class="step-desc">Fina analyzes your patterns and surfaces insights you wouldn't find manually —
+                    overspending alerts, saving opportunities, monthly summaries.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section id="testimonials" style="padding-bottom:4rem">
+        <div class="section-header center reveal">
+            <div class="section-eyebrow">What People Say</div>
+            <h2 class="section-title">Loved by people who care about money</h2>
+        </div>
+        <div style="overflow:hidden;margin:0 calc(-1 * max(1.5rem,6vw))">
+            <div class="testimonial-track" id="testimonial-track"></div>
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section id="pricing">
+        <div class="section-header center reveal">
+            <div class="section-eyebrow">Simple Pricing</div>
+            <h2 class="section-title">Start free. Scale when you're ready.</h2>
+            <p class="section-desc">No hidden fees. No credit card required to start. Upgrade when Fina becomes
+                indispensable.</p>
+        </div>
+        <div class="pricing-grid">
+            <div class="pricing-card reveal">
+                <div class="pricing-tier">Free</div>
+                <div class="pricing-price"><sup>$</sup>0<sub>/mo</sub></div>
+                <p class="pricing-desc">Perfect for getting started and tracking everyday expenses.</p>
+                <div class="pricing-features">
+                    <div class="pf-item">
+                        <div class="pf-check">✓</div> Up to 50 transactions/month
+                    </div>
+                    <div class="pf-item">
+                        <div class="pf-check">✓</div> 3 budget categories
+                    </div>
+                    <div class="pf-item">
+                        <div class="pf-check">✓</div> Basic analytics
+                    </div>
+                    <div class="pf-item">
+                        <div class="pf-x">✕</div><span style="color:var(--text-tertiary)">Savings goals</span>
+                    </div>
+                    <div class="pf-item">
+                        <div class="pf-x">✕</div><span style="color:var(--text-tertiary)">AI insights</span>
+                    </div>
+                    <div class="pf-item">
+                        <div class="pf-x">✕</div><span style="color:var(--text-tertiary)">CSV/PDF export</span>
+                    </div>
+                </div>
+                <a href="register.html" class="btn-pricing btn-pricing-outline">Get Started Free</a>
+            </div>
+            <div class="pricing-card popular reveal">
+                <div class="popular-badge">⭐ Most Popular</div>
+                <div class="pricing-tier">Pro</div>
+                <div class="pricing-price"><sup>$</sup>9<sub>/mo</sub></div>
+                <p class="pricing-desc">For anyone serious about financial growth and hitting goals faster.</p>
+                <div class="pricing-features">
+                    <div class="pf-item">
+                        <div class="pf-check">✓</div> Unlimited transactions
+                    </div>
+                    <div class="pf-item">
+                        <div class="pf-check">✓</div> Unlimited budgets
+                    </div>
+                    <div class="pf-item">
+                        <div class="pf-check">✓</div> Advanced analytics
+                    </div>
+                    <div class="pf-item">
+                        <div class="pf-check">✓</div> Savings goals
+                    </div>
+                    <div class="pf-item">
+                        <div class="pf-check">✓</div> AI-powered insights
+                    </div>
+                    <div class="pf-item">
+                        <div class="pf-x">✕</div><span style="color:var(--text-tertiary)">Team sharing</span>
+                    </div>
+                </div>
+                <a href="register.html" class="btn-pricing btn-pricing-primary">Start Pro Trial</a>
+            </div>
+            <div class="pricing-card reveal">
+                <div class="pricing-tier">Premium</div>
+                <div class="pricing-price"><sup>$</sup>19<sub>/mo</sub></div>
+                <p class="pricing-desc">For power users and small households who want everything Fina has to offer.</p>
+                <div class="pricing-features">
+                    <div class="pf-item">
+                        <div class="pf-check">✓</div> Everything in Pro
+                    </div>
+                    <div class="pf-item">
+                        <div class="pf-check">✓</div> CSV & PDF export
+                    </div>
+                    <div class="pf-item">
+                        <div class="pf-check">✓</div> Team sharing (up to 5)
+                    </div>
+                    <div class="pf-item">
+                        <div class="pf-check">✓</div> Priority support
+                    </div>
+                    <div class="pf-item">
+                        <div class="pf-check">✓</div> Custom categories
+                    </div>
+                    <div class="pf-item">
+                        <div class="pf-check">✓</div> Recurring transactions
+                    </div>
+                </div>
+                <a href="register.html" class="btn-pricing btn-pricing-outline">Get Premium</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq">
+        <div class="section-header center reveal">
+            <div class="section-eyebrow">FAQ</div>
+            <h2 class="section-title">Common questions, honest answers</h2>
+        </div>
+        <div class="faq-wrap" id="faq-wrap"></div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-top">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <div class="footer-logo-mark"><svg viewBox="0 0 18 18" fill="none">
+                            <path d="M9 1L16.5 5.5V12.5L9 17L1.5 12.5V5.5L9 1Z" fill="currentColor" opacity=".9" />
+                            <path d="M9 5L13 7.5V12.5L9 15L5 12.5V7.5L9 5Z" fill="rgba(255,255,255,.3)" />
+                        </svg></div>
+                    Fina
+                </div>
+                <p class="footer-brand-desc">Smart, beautiful, and privacy-first expense tracking. Your financial story,
+                    told clearly.</p>
+                <div class="creator-badge">✦ Designed & Developed by Saloni Agalawe</div>
+            </div>
+            <div>
+                <div class="footer-col-title">Product</div>
+                <div class="footer-links">
+                    <a href="#features" class="footer-link">Features</a>
+                    <a href="#pricing" class="footer-link">Pricing</a>
+                    <a href="login.html" class="footer-link">Sign In</a>
+                    <a href="register.html" class="footer-link">Sign Up</a>
+                </div>
+            </div>
+            <div>
+                <div class="footer-col-title">Resources</div>
+                <div class="footer-links">
+                    <a href="#how" class="footer-link">How it Works</a>
+                    <a href="#faq" class="footer-link">FAQ</a>
+                    <a href="#" class="footer-link">Privacy Policy</a>
+                    <a href="#" class="footer-link">Terms of Service</a>
+                </div>
+            </div>
+            <div>
+                <div class="footer-col-title">Creator</div>
+                <div class="footer-links">
+                    <a href="dashboard.html" class="footer-link">Dashboard</a>
+                    <a href="#" class="footer-link">GitHub</a>
+                    <a href="#" class="footer-link">LinkedIn</a>
+                    <a href="#" class="footer-link">Portfolio</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-copy">© 2025 Fina. Built with ♥ for modern finance.</div>
+            <div class="footer-creator">Built by <strong>Saloni Agalawe</strong> — Computer Engineering Student · AI &
+                ML Enthusiast</div>
+        </div>
+    </footer>
+
+    <script>
+        // ── Theme Toggle ──
+        const html = document.documentElement;
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        function applyTheme(t) {
+            html.dataset.theme = t;
+            localStorage.setItem('fina-theme', t);
+            if (t === 'dark') { sunIcon.style.display = 'block'; moonIcon.style.display = 'none' }
+            else { sunIcon.style.display = 'none'; moonIcon.style.display = 'block' }
+            const nb = document.getElementById('navbar');
+            if (window.scrollY > 20) {
+                nb.classList.toggle('scrolled', t === 'dark');
+                nb.classList.toggle('scrolled-light', t === 'light');
+            }
+        }
+        const savedTheme = localStorage.getItem('fina-theme') || 'dark';
+        applyTheme(savedTheme);
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            applyTheme(html.dataset.theme === 'dark' ? 'light' : 'dark');
+        });
+
+        // ── Navbar scroll ──
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            const scrolled = window.scrollY > 20;
+            const theme = html.dataset.theme;
+            navbar.classList.toggle('scrolled', scrolled && theme === 'dark');
+            navbar.classList.toggle('scrolled-light', scrolled && theme === 'light');
+            document.getElementById('scroll-progress').style.width = (window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100) + '%';
+        });
+
+        // ── Hamburger ──
+        const hamburger = document.getElementById('hamburger');
+        const navMobile = document.getElementById('nav-mobile');
+        hamburger.addEventListener('click', () => navMobile.classList.toggle('open'));
+        document.querySelectorAll('.nav-mobile .nav-link, .nav-mobile .btn-primary').forEach(a => a.addEventListener('click', () => navMobile.classList.remove('open')));
+
+        // ── Canvas particles ──
+        const canvas = document.getElementById('hero-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight }
+        resize();
+        window.addEventListener('resize', () => { resize(); initParticles() });
+        function initParticles() {
+            particles = [];
+            const count = Math.floor(canvas.width / 20);
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+                    vx: (Math.random() - .5) * .3, vy: (Math.random() - .5) * .3,
+                    r: Math.random() * 1.5 + .5, opacity: Math.random() * .4 + .1
+                });
+            }
+        }
+        initParticles();
+        function animateCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const isDark = html.dataset.theme === 'dark';
+            const col = isDark ? '124,109,255' : '101,80,239';
+            particles.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${col},${p.opacity})`;
+                ctx.fill();
+            });
+            // Draw connections
+            particles.forEach((p, i) => {
+                particles.slice(i + 1).forEach(q => {
+                    const d = Math.hypot(p.x - q.x, p.y - q.y);
+                    if (d < 80) {
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y);
+                        ctx.strokeStyle = `rgba(${col},${(.08 * (1 - d / 80))})`;
+                        ctx.lineWidth = .5;
+                        ctx.stroke();
+                    }
+                });
+            });
+            requestAnimationFrame(animateCanvas);
+        }
+        animateCanvas();
+
+        // ── Dashboard bars ──
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+        const vals = [65, 45, 80, 55, 70, 90];
+        const barsEl = document.getElementById('hd-bars');
+        months.forEach((m, i) => {
+            const g = document.createElement('div');
+            g.style.cssText = `flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end`;
+            const bar = document.createElement('div');
+            const h = vals[i];
+            bar.style.cssText = `width:100%;height:${h}%;border-radius:4px 4px 0 0;background:${i === 5 ? 'var(--accent)' : 'var(--bg-elevated)'};border:1px solid ${i === 5 ? 'transparent' : 'var(--border-soft)'}`;
+            const label = document.createElement('div');
+            label.style.cssText = 'font-size:10px;color:var(--text-tertiary)';
+            label.textContent = m;
+            g.appendChild(bar); g.appendChild(label);
+            barsEl.appendChild(g);
+        });
+
+        // ── Ticker ──
+        const tickerData = [
+            { label: 'Expenses Added', val: '+2,847', color: 'var(--green)' },
+            { label: 'Savings Increased', val: '+$12.4M', color: 'var(--accent)' },
+            { label: 'Transactions Processed', val: '1.2M', color: 'var(--sky)' },
+            { label: 'Monthly Reports Generated', val: '48K', color: 'var(--green)' },
+            { label: 'Budgets Set', val: '92K', color: 'var(--amber)' },
+            { label: 'Goals Achieved', val: '31K 🎉', color: 'var(--green)' },
+            { label: 'Active Users', val: '140K+', color: 'var(--accent)' },
+        ];
+        const ticker = document.getElementById('ticker-inner');
+        // Double the items for seamless loop
+        [...tickerData, ...tickerData].forEach(d => {
+            const item = document.createElement('div');
+            item.className = 'ticker-item';
+            item.innerHTML = `<div class="ticker-dot"></div><span class="ti-label">${d.label}</span><span class="ti-val" style="color:${d.color}">${d.val}</span>`;
+            ticker.appendChild(item);
+        });
+
+        // ── Testimonials ──
+        const testimonials = [
+            { text: "Fina completely changed how I relate to money. The budget alerts alone saved me from overspending twice last month.", name: "Priya Sharma", role: "UX Designer, Bangalore", stars: 5, init: "PS" },
+            { text: "I've tried every expense app out there. Fina is the first one that actually feels good to use every day.", name: "Rohan Mehta", role: "Software Engineer, Mumbai", stars: 5, init: "RM" },
+            { text: "The AI insights feature is surprisingly useful. It noticed I was spending 30% more on food on weekends before I did.", name: "Ananya Iyer", role: "MBA Student, Pune", stars: 5, init: "AI" },
+            { text: "I showed this to my entire study group. Everyone was impressed. The dark mode and animations are top tier.", name: "Vikram Nair", role: "CS Student, Hyderabad", stars: 5, init: "VN" },
+            { text: "Finally a finance app that doesn't feel like a spreadsheet. The savings goals section motivates me like nothing else.", name: "Tanisha Gupta", role: "Content Creator, Delhi", stars: 5, init: "TG" },
+            { text: "Set up in 3 minutes, useful on day one. That's rare for any finance tool. The design is genuinely premium.", name: "Arjun Patel", role: "Product Manager, Ahmedabad", stars: 5, init: "AP" },
+        ];
+        const track = document.getElementById('testimonial-track');
+        [...testimonials, ...testimonials].forEach(t => {
+            const card = document.createElement('div');
+            card.className = 'testimonial-card';
+            card.innerHTML = `<div class="t-stars">${'⭐'.repeat(t.stars)}</div><p class="t-text">"${t.text}"</p><div class="t-author"><div class="t-avatar">${t.init}</div><div><div class="t-name">${t.name}</div><div class="t-role">${t.role}</div></div></div>`;
+            track.appendChild(card);
+        });
+
+        // ── FAQ ──
+        const faqs = [
+            { q: "Is my financial data secure?", a: "Yes. All data is stored locally in your browser using localStorage. Nothing is sent to any server. Fina is fully client-side, meaning you have complete control over your data at all times." },
+            { q: "Do I need to connect my bank account?", a: "No. Fina works through manual expense logging. This keeps things simple, private, and works regardless of your bank or country." },
+            { q: "Can I use Fina on mobile?", a: "Absolutely. Fina is fully responsive and works beautifully on phones, tablets, and desktops. The layout and interactions are optimized for touch screens." },
+            { q: "Is the free plan really free forever?", a: "Yes, the free plan is free forever with no credit card required. You can upgrade to Pro or Premium whenever you need more power." },
+            { q: "Can I export my data?", a: "Yes. Pro and Premium plans support CSV and PDF export. You can download a full report of your expenses at any time." },
+            { q: "Who built Fina?", a: "Fina was designed and developed by Saloni Agalawe, a Computer Engineering student with a passion for building impactful, beautifully designed technology products." },
+        ];
+        const faqWrap = document.getElementById('faq-wrap');
+        faqs.forEach(f => {
+            const item = document.createElement('div');
+            item.className = 'faq-item';
+            item.innerHTML = `<div class="faq-question">${f.q}<div class="faq-icon">+</div></div><div class="faq-answer"><p>${f.a}</p></div>`;
+            item.querySelector('.faq-question').addEventListener('click', () => {
+                const wasOpen = item.classList.contains('open');
+                faqWrap.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+                if (!wasOpen) item.classList.add('open');
+            });
+            faqWrap.appendChild(item);
+        });
+
+        // ── Reveal on scroll ──
+        const revealEls = document.querySelectorAll('.reveal');
+        const revealObs = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in') });
+        }, { threshold: .12 });
+        revealEls.forEach(el => revealObs.observe(el));
+
+        // ── Counter animation ──
+        function animateCount(el, end, decimals = 0) {
+            let start = 0, dur = 2000, startTime = null;
+            function step(ts) {
+                if (!startTime) startTime = ts;
+                const prog = Math.min((ts - startTime) / dur, 1);
+                const val = start + (end - start) * (prog < .5 ? 2 * prog * prog : 1 - Math.pow(-2 * prog + 2, 2) / 2);
+                el.textContent = decimals ? val.toFixed(decimals) : Math.floor(val);
+                if (prog < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+        const statsObs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting && !e.target.dataset.counted) {
+                    e.target.dataset.counted = '1';
+                    animateCount(document.getElementById('stat-users'), 140);
+                    animateCount(document.getElementById('stat-txns'), 12);
+                    animateCount(document.getElementById('stat-saved'), 24);
+                    animateCount(document.getElementById('stat-rating'), 4.9, 1);
+                }
+            });
+        }, { threshold: .4 });
+        statsObs.observe(document.getElementById('stats'));
+    </script>
 </body>
 
 </html>
