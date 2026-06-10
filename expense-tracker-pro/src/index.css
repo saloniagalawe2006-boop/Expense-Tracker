@@ -1,0 +1,44 @@
+/* src/index.css */
+
+/* Remove default margin/padding from everything */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Root font and smooth rendering */
+html {
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  background: #080a0f;
+  color: #f0f3ff;
+  line-height: 1.6;
+}
+
+/* Remove link underlines */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Remove button styles */
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+/* Images never overflow their container */
+img {
+  max-width: 100%;
+  display: block;
+}
